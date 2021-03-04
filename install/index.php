@@ -45,8 +45,8 @@ class dky_gift extends CModule {
 
     function copyFiles() {
 
-        CopyDirFiles($this->moduleRoot . '/install/admin', $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin');
-        CopyDirFiles($this->moduleRoot . '/install/components', $this->componentsRoot);
+        CopyDirFiles($this->moduleRoot . '/install/admin', $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin', true, true);
+        CopyDirFiles($this->moduleRoot . '/install/components', $this->componentsRoot, true, true);
     }
 
     function deleteFiles() {
