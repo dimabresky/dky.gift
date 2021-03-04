@@ -31,9 +31,9 @@ class dky_gift extends CModule {
     }
 
     public function DoInstall() {
+        RegisterModule($this->MODULE_ID);
         $this->installEventsHandlers();
         $this->copyFiles();
-        RegisterModule($this->MODULE_ID);
     }
 
     public function DoUninstall() {
