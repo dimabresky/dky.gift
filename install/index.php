@@ -12,6 +12,7 @@ class dky_gift extends CModule {
     public $MODULE_VERSION;
     public $MODULE_VERSION_DATE;
     public $moduleRoot = '';
+    public $componentsRoot = '';
 
     function __construct() {
 
@@ -22,8 +23,10 @@ class dky_gift extends CModule {
 
         if (strpos(__DIR__, 'local/modules') !== false) {
             $this->moduleRoot = $_SERVER['DOCUMENT_ROOT'] . '/local/modules/dky.gift';
+            $this->componentsRoot = $_SERVER['DOCUMENT_ROOT'] . '/local/components';
         } else {
             $this->moduleRoot = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/dky.gift';
+            $this->componentsRoot = $_SERVER['DOCUMENT_ROOT'] . '/bitrix/components';
         }
     }
 
@@ -43,12 +46,17 @@ class dky_gift extends CModule {
     function copyFiles() {
 
         CopyDirFiles($this->moduleRoot . '/install/admin', $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin');
+        CopyDirFiles($this->moduleRoot . '/install/components', $this->componentsRoot);
     }
 
     function deleteFiles() {
         DeleteDirFiles(
                 $this->moduleRoot . '/install/admin',
                 $_SERVER["DOCUMENT_ROOT"] . '/bitrix/admin'
+        );
+        DeleteDirFiles(
+                $this->moduleRoot . '/install/components',
+                $this->componentsRoot
         );
     }
 
