@@ -33,6 +33,7 @@ if ($request->isAjaxRequest()) {
         $arProducts = [];
         while ($arProduct = $dbProducts->Fetch()) {
             $arProduct['checked'] = false;
+            $arProduct['SORT'] = 100;
             $arProduct['PAGE_LINK'] = '/bitrix/admin/iblock_element_edit.php?IBLOCK_ID=' . Options::CATALOG_IBLOCK_ID . '&type=catalog&ID=' . $arProduct['ID'] . '&lang=ru&find_section_section=0&WF=Y';
             $arProducts[] = $arProduct;
         }
@@ -120,6 +121,9 @@ echo EndNote()
     .inc-options {
         margin-bottom: 20px;
     }
+    .sort-input {
+        width: 50px;
+    }
 </style>
 <template id="add-product-popup-template">
 
@@ -173,6 +177,7 @@ echo EndNote()
             </div>
             <div v-if="condition.giftProducts"  class="product-list-tags">
                 <div v-for="product in condition.productsList" :key="product.ID" class="products-list-tags__tag product-tag">
+                    <b>s:</b> <input class="sort-input" type="number" v-model="product.SORT">&nbsp;
                     <a target="_blank" :href="product.PAGE_LINK" class="product-tag__name">{{product.NAME}}</a>&nbsp;&nbsp;<span @click="removeProduct(index, product.ID)" class="product-tag__remove">&times;</span>
                 </div>
             </div>

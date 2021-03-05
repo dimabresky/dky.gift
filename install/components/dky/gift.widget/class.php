@@ -10,6 +10,7 @@ use Bitrix\Main\Engine\Contract\Controllerable;
 use Bitrix\Main\Engine\ActionFilter;
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Highloadblock\HighloadBlockTable as HL;
+use Bitrix\Catalog\ProductTable;
 
 Loc::loadMessages(__FILE__);
 
@@ -168,9 +169,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
 
         $this->removeGifts();
 
-        $arGiftsList = $this->addAndGetGiftsList();
-
-        $lastBasketGiftProductid = array_pop($arGiftsList);
+        $lastBasketGiftProductid = $this->addAndGetAddedGiftId();
 
         $this->setLastGiftInfo($lastBasketGiftProductid);
 
@@ -293,43 +292,56 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
 
     /**
      * 
-     * @return array
+     * @return int|null
      */
-    function addAndGetGiftsList() {
+    function addAndGetAddedGiftId() {
 
         $arConditions = Tools::getConditionsByPrice($this->getBasketTotalPrice());
-        $arGiftsList = [];
+        $giftid = [];
         if (!empty($arConditions)) {
             $basket = Sale\Basket::loadItemsForFUser(Sale\Fuser::getId(), Context::getCurrent()->getSite());
             foreach ($arConditions['current'] as $arCondition) {
 
                 if ($arCondition['giftProducts'] && !empty($arCondition['productsList'])) {
-                    foreach ($arCondition['productsList'] as $k => $product) {
-                        // add gift with custom price
-                        $arPriceData = CCatalogProduct::GetOptimalPrice($product['ID']);
-                        $fields = [
-                            'PRODUCT_ID' => $product['ID'], // ID товара, обязательно
-                            'QUANTITY' => 1, // количество, обязательно
-                            'PRICE' => Options::PRICE,
-                            'DISCOUNT_PRICE' => $arPriceData['RESULT_PRICE']['BASE_PRICE'] - Options::PRICE,
-                            'BASE_PRICE' => $arPriceData['RESULT_PRICE']['BASE_PRICE'],
-                            'CURRENCY' => Options::CURRENCY,
-                            'PRODUCT_PROVIDER_CLASS' => 'CCatalogProductProvider',
-                            'CUSTOM_PRICE' => 'Y',
-                            'PROPS' => [
-                                ['NAME' => 'gift', 'CODE' => 'DKY:GIFT', 'VALUE' => 'Y'],
-                            ],
-                        ];
 
-                        $res = Basket::addProduct($fields, [], ['USE_MERGE' => 'N']);
-                        if ($res->isSuccess()) {
-                            $arGiftsList[] = $product['ID'];
+                    // get gifts with quantity >0 in system
+                    $giftsid = array_column($arCondition['productsList'], "ID");
+                    $arInvoleGifts = array_column(ProductTable::getList([
+                                'filter' => [
+                                    'ID' => $giftsid,
+                                    '>QUANTITY' => 0
+                                ],
+                                'select' => ['ID']
+                            ])->fetchAll(), "ID");
+                    foreach ($arCondition['productsList'] as $k => $product) {
+                        if (in_array($product['ID'], $arInvoleGifts)) {
+                            // add gift with custom price
+                            $arPriceData = CCatalogProduct::GetOptimalPrice($product['ID']);
+                            $fields = [
+                                'PRODUCT_ID' => $product['ID'], // ID товара, обязательно
+                                'QUANTITY' => 1, // количество, обязательно
+                                'PRICE' => Options::PRICE,
+                                'DISCOUNT_PRICE' => $arPriceData['RESULT_PRICE']['BASE_PRICE'] - Options::PRICE,
+                                'BASE_PRICE' => $arPriceData['RESULT_PRICE']['BASE_PRICE'],
+                                'CURRENCY' => Options::CURRENCY,
+                                'PRODUCT_PROVIDER_CLASS' => 'CCatalogProductProvider',
+                                'CUSTOM_PRICE' => 'Y',
+                                'PROPS' => [
+                                    ['NAME' => 'gift', 'CODE' => 'DKY:GIFT', 'VALUE' => 'Y'],
+                                ],
+                            ];
+
+                            $res = Basket::addProduct($fields, [], ['USE_MERGE' => 'N']);
+                            if ($res->isSuccess()) {
+                                $giftid = $product['ID'];
+                            }
+                            break;
                         }
                     }
                 }
             }
         }
-        return $arGiftsList;
+        return $giftid;
     }
 
     /**

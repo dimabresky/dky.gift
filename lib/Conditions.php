@@ -58,6 +58,7 @@ class Conditions implements \ArrayAccess, \Iterator, \Countable {
                                 }
 
                                 $arProduct['NAME'] = $arProducts[$arProduct['ID']]['NAME'];
+                                $arProduct['SORT'] = $arProduct['SORT'] ?: 100;
                             } else {
                                 $arProduct = null;
                             }
@@ -65,6 +66,11 @@ class Conditions implements \ArrayAccess, \Iterator, \Countable {
                         $arCondition['productsList'] = array_values(array_filter($arCondition['productsList'], function ($arr) {
                                     return $arr !== null;
                                 }));
+                        usort($this->conditions[$k]['productsList'], function ($a, $b) {
+                           
+                            if ($a['SORT'] == $b['SORT']) {return 0;}
+                            return $a['SORT']>$b['SORT'] ? 1 : -1;
+                        });
                     } else {
                         $arCondition['productsList'] = [];
                     }
