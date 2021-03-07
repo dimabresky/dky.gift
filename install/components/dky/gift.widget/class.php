@@ -224,6 +224,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
                             'NAME' => $arRow['NAME'],
                             'IMG_SRC' => $this->getResizedImgSrc($arRow['DETAIL_PICTURE'])
                         ];
+                        break;
                     }
                 }
             }
