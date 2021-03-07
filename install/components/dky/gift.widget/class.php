@@ -216,16 +216,14 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
             if ($arConditions['next']['giftProducts'] && !empty($arConditions['next']['productsList'])) {
                 $productsListId = array_column($arConditions['next']['productsList'], 'ID');
                 $arInvolveGifts = $this->getInvolveGifts($productsListId);
-                $dbRows = CIBlockElement::GetList(false, ['IBLOCK_ID' => Options::CATALOG_IBLOCK_ID, 'ACTIVE' => 'Y', 'ID' => $productsListId], false, false, ['ID', 'NAME', 'DETAIL_PICTURE']);
-                while ($arRow = $dbRows->Fetch()) {
-                    if (in_array($arRow['ID'], $arInvolveGifts)) {
-                        $this->arResult['DISPLAY_GIFT_CONDITION']['gifts'][] = [
-                            'ID' => $arRow['ID'],
-                            'NAME' => $arRow['NAME'],
-                            'IMG_SRC' => $this->getResizedImgSrc($arRow['DETAIL_PICTURE'])
-                        ];
-                        break;
-                    }
+                if (isset($arInvolveGifts[0])) {
+
+                    $arRow = CIBlockElement::GetList(false, ['IBLOCK_ID' => Options::CATALOG_IBLOCK_ID, 'ACTIVE' => 'Y', 'ID' => $arInvolveGifts[0]], false, false, ['ID', 'NAME', 'DETAIL_PICTURE'])->Fetch();
+                    $this->arResult['DISPLAY_GIFT_CONDITION']['gifts'][] = [
+                        'ID' => $arRow['ID'],
+                        'NAME' => $arRow['NAME'],
+                        'IMG_SRC' => $this->getResizedImgSrc($arRow['DETAIL_PICTURE'])
+                    ];
                 }
             }
 
@@ -349,12 +347,12 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
     function getInvolveGifts(array $giftsid) {
 
         return array_column(ProductTable::getList([
-                    'filter' => [
-                        'ID' => $giftsid,
-                        '>QUANTITY' => 0
-                    ],
-                    'select' => ['ID']
-                ])->fetchAll(), "ID") ?: [];
+                            'filter' => [
+                                'ID' => $giftsid,
+                                '>QUANTITY' => 0
+                            ],
+                            'select' => ['ID']
+                        ])->fetchAll(), "ID") ?: [];
     }
 
     /**
