@@ -215,13 +215,16 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
 
             if ($arConditions['next']['giftProducts'] && !empty($arConditions['next']['productsList'])) {
                 $productsListId = array_column($arConditions['next']['productsList'], 'ID');
+                $arInvolveGifts = $this->getInvolveGifts($productsListId);
                 $dbRows = CIBlockElement::GetList(false, ['IBLOCK_ID' => Options::CATALOG_IBLOCK_ID, 'ACTIVE' => 'Y', 'ID' => $productsListId], false, false, ['ID', 'NAME', 'DETAIL_PICTURE']);
                 while ($arRow = $dbRows->Fetch()) {
-                    $this->arResult['DISPLAY_GIFT_CONDITION']['gifts'][] = [
-                        'ID' => $arRow['ID'],
-                        'NAME' => $arRow['NAME'],
-                        'IMG_SRC' => $this->getResizedImgSrc($arRow['DETAIL_PICTURE'])
-                    ];
+                    if (in_array($arRow['ID'], $arInvolveGifts)) {
+                        $this->arResult['DISPLAY_GIFT_CONDITION']['gifts'][] = [
+                            'ID' => $arRow['ID'],
+                            'NAME' => $arRow['NAME'],
+                            'IMG_SRC' => $this->getResizedImgSrc($arRow['DETAIL_PICTURE'])
+                        ];
+                    }
                 }
             }
 
@@ -305,16 +308,9 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
                 if ($arCondition['giftProducts'] && !empty($arCondition['productsList'])) {
 
                     // get gifts with quantity >0 in system
-                    $giftsid = array_column($arCondition['productsList'], "ID");
-                    $arInvoleGifts = array_column(ProductTable::getList([
-                                'filter' => [
-                                    'ID' => $giftsid,
-                                    '>QUANTITY' => 0
-                                ],
-                                'select' => ['ID']
-                            ])->fetchAll(), "ID");
+                    $arInvolveGifts = $this->getInvolveGifts(array_column($arCondition['productsList'], "ID"));
                     foreach ($arCondition['productsList'] as $k => $product) {
-                        if (in_array($product['ID'], $arInvoleGifts)) {
+                        if (in_array($product['ID'], $arInvolveGifts)) {
                             // add gift with custom price
                             $arPriceData = CCatalogProduct::GetOptimalPrice($product['ID']);
                             $fields = [
@@ -342,6 +338,22 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
             }
         }
         return $giftid;
+    }
+
+    /**
+     * 
+     * @param array $giftsid
+     * @return array
+     */
+    function getInvolveGifts(array $giftsid) {
+
+        return array_column(ProductTable::getList([
+                    'filter' => [
+                        'ID' => $giftsid,
+                        '>QUANTITY' => 0
+                    ],
+                    'select' => ['ID']
+                ])->fetchAll(), "ID") ?: [];
     }
 
     /**
