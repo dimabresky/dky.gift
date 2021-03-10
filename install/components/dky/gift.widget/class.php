@@ -138,10 +138,6 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
 
     function executeComponent() {
 
-        if (CSite::InDir("/personal/cart/") && CSite::InDir("/personal/order/make/")) {
-            return;
-        }
-
         if (!Loader::includeModule('dky.gift')) {
             return;
         }
@@ -154,7 +150,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
         }
 
         $this->setResult();
-
+        
         $this->includeComponentTemplate();
     }
 
@@ -182,7 +178,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
 
     function setDisplayGiftsConditionData() {
         $price = $this->getBasketTotalPrice();
-        $arConditions = Tools::getConditionsByPrice($this->getBasketTotalPrice());
+        $arConditions = Tools::getConditionsByPrice($price);
         if ($arConditions['next']) {
 
             $priceFrom = 0;
@@ -300,7 +296,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
      * @return int|null
      */
     function addAndGetAddedGiftId() {
-
+print_r($this->getBasketTotalPrice());
         $arConditions = Tools::getConditionsByPrice($this->getBasketTotalPrice());
         $giftid = [];
         if (!empty($arConditions)) {

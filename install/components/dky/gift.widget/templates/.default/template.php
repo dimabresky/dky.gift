@@ -4,6 +4,11 @@ use Bitrix\Main\Localization\Loc;
 
 Loc::loadMessages(__FILE__);
 
+
+if (CSite::InDir("/personal/cart/") || CSite::InDir("/personal/order/make/")) {
+    return;
+}
+
 CJSCore::Init(['popup']);
 CJSCore::Init(['ajax']);
 \Bitrix\Main\UI\Extension::load("ui.vue");
