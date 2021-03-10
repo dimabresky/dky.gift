@@ -2,6 +2,11 @@
 BX.namespace('DkyGifts');
 
 BX.DkyGifts.WidgetComponent = function (options) {
+
+    function setCookie() {
+        BX.setCookie('dky_gift_not_show_gift_info', 'Y', {expires: 99999999});
+    }
+
     BX.Vue.component('dky-widget', {
         template: document.getElementById('widget-template').innerHTML,
         props: {
@@ -57,6 +62,18 @@ BX.DkyGifts.WidgetComponent = function (options) {
                     giftInfo: options.giftInfo,
                     showGiftInfo: true,
                     isMobile: true
+                },
+                methods: {
+                    closeAndRedirect() {
+                        setCookie();
+                        setTimeout(function () {
+                            location.href = '/personal/cart/';
+                        }, 500);
+                    },
+                    close() {
+                        setCookie();
+                        this.showGiftInfo = false;
+                    }
                 }
             });
         }
@@ -173,11 +190,11 @@ BX.DkyGifts.WidgetComponent = function (options) {
                 setOpenWidjetEvent() {
 
                     const node = document.querySelector(options.triggerWidgetShowSelector);
-                    
+
                     if (node) {
 
                         node.onclick = (e) => {
-                            
+
                             e.preventDefault();
 
                             popupWidget.setBindElement(node);
@@ -234,6 +251,18 @@ BX.DkyGifts.WidgetComponent = function (options) {
                 },
                 mounted() {
                     popupGiftInfo.show();
+                },
+                methods: {
+                    closeAndRedirect() {
+                        setCookie();
+                        setTimeout(function () {
+                            location.href = '/personal/cart/';
+                        }, 500);
+                    },
+                    close() {
+                        setCookie();
+                        this.showGiftInfo = false;
+                    }
                 }
             });
         }

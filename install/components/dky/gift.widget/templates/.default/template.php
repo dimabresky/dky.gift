@@ -24,11 +24,11 @@ CJSCore::Init(['ajax']);
                 <div class="gift__title"><?= Loc::getMessage('DKY_GIFT_WIDGET_GIFT_INFO_TITLE') ?></div>
             </div>
             <div class="dky-widget-gifts__gift gift">
-                <button onclick="BX.setCookie('dky_gift_not_show_gift_info', 'Y', {expires: 999999});location.href = '/personal/cart/'" class="btn_gift"><?= Loc::getMessage('DKY_GIFT_WIDGET_SHOW_BTN') ?></button>
+                <button @click="closeAndRedirect" class="btn_gift"><?= Loc::getMessage('DKY_GIFT_WIDGET_SHOW_BTN') ?></button>
             </div>
         </div>
-        <div v-if="isMobile" @click="BX.setCookie('dky_gift_not_show_gift_info', 'Y', {expires: 999999});showGiftInfo=false" class="dky-widget__closer">&times;</div>
-        <div v-else @click="BX.setCookie('dky_gift_not_show_gift_info', 'Y', {expires: 999999});showGiftInfo=false" class="dky-widget__closer dky-widget__closer_popup-position">&times;</div>
+        <div v-if="isMobile" @click="close" class="dky-widget__closer">&times;</div>
+        <div v-else @click="close" class="dky-widget__closer dky-widget__closer_popup-position">&times;</div>
     </div>
 </template>
 <template id="widget-template">
