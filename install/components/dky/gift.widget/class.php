@@ -296,7 +296,7 @@ class DkyGiftWidgetComponent extends CBitrixComponent implements Controllerable 
      * @return int|null
      */
     function addAndGetAddedGiftId() {
-print_r($this->getBasketTotalPrice());
+        
         $arConditions = Tools::getConditionsByPrice($this->getBasketTotalPrice());
         $giftid = [];
         if (!empty($arConditions)) {
